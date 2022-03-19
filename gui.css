@@ -1,0 +1,64 @@
+body {
+    margin: 0;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h3 {
+    margin: 0;
+}
+
+canvas {
+    border: 1px dotted #ccc;
+}
+
+#canvas-resizer {
+    position: absolute;
+    top: calc(100% - 0.5rem);
+    left: calc(100% - 0.5rem);
+    background: gray;
+    border: 1px solid #ccc;
+    border-radius: 100%;
+    width: 1rem;
+    height: 1rem;
+}
+
+#canvas-resizer:hover {
+    background: lightgray;
+    cursor: grab;
+}
+
+strong {
+    font-weight: normal !important;
+}
+
+input[type=range] {
+    vertical-align: bottom;
+    width: 80px;
+}
+
+section {
+    float: left;
+    padding: 1rem;
+}
+#controls {
+    width: 375px;
+}
+#canvas {
+    width: 1000px;
+}
+
+.control {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-bottom: 1rem;
+    font-family: monospace;
+    font-size: 11px;
+}
+
+button {
+    font-size: 11px;
+}
+

@@ -128,6 +128,7 @@ $(document).ready(() => {
 
     const canvas = window.canvas = new fabric.Canvas('c');
 
+    let atlasJson;
     let atlas;
     let slides;
     let atlasIndex = 0;
@@ -219,6 +220,7 @@ $(document).ready(() => {
     });
 
     $.getJSON('atlases.json').then(json => {
+        atlasJson = json;
         atlas = json.mouse.coronal;
         $("#atlas-title").html(`Current: ${atlasFilename()}`);
 
@@ -263,5 +265,15 @@ $(document).ready(() => {
     $('#next-slide').click(() => {
         slideIndex += 1;
         updateSlide();
+    });
+
+    $('#atlases').change((ev) => {
+        const parts = $(ev.currentTarget).val().split('.');
+        atlas = atlasJson[parts[0]][parts[1]];
+        atlasIndex = 0;
+        atlasImage.setSrc(atlasPath(), () => {
+            canvas.requestRenderAll();
+            $("#atlas-title").html(`Current: ${atlasFilename()}`);
+        });
     });
 });

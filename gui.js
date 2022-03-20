@@ -12,116 +12,121 @@ function download(imageURL, filename) {
     document.body.removeChild(element);
 }
 
+function setupImageControls(fabImage, controls, title, canvas) {
+    controls.html(`
+        <h3>${title}</h3>
 
-$(document).ready(() => {
-    const canvas = window.canvas = new fabric.Canvas('c');
+        <div class='control-line'>
+            <strong>shift</strong>
+            x: <input class='left' type='range' value='500' min='-200' max='1200' step='1'/>
+            y: <input class='top' type='range' value='333' min='-200' max='866' step='1'/>
+            <button class='reset-shift'>reset</button>
+        </div>
 
-    class Image {
-        constructor(fabImage, controls, title) {
-            const that = this;
-            this.fabImage = fabImage;
-            this.controls = controls;
+        <div class='control-line'>
+            <strong>scale</strong>
+            x: <input class='scaleX' type='range' value='1' min='0.01' max='1' step='0.01'/>
+            y: <input class='scaleY' type='range' value='1' min='0.01' max='1' step='0.01'/>
+            <button class='reset-scale'>reset</button>
+            <label>lock<input type='checkbox' checked class='lock'></label>
+        </div>
 
-            controls.html(`
-                <h3>${title}</h3>
+        <div class='control-line'>
+            <strong>skew&nbsp;</strong>
+            x: <input class='skewX' type='range' value='0' min='-80' max='80' step='1'/>
+            y: <input class='skewY' type='range' value='0' min='-80' max='80' step='1'/>
+            <button class='reset-skew'>reset</button>
+        </div>
 
-                <strong>shift</strong>
-                x: <input class='left' type='range' value='500' min='-200' max='1200' step='1'/>
-                y: <input class='top' type='range' value='333' min='-200' max='866' step='1'/>
-                <button class='reset-shift'>reset</button>
-                <br>
+        <div class='control-line'>
+            <strong>angle</strong>
+            <input class='angle' type='range' value='0' min='-360' max='360'/>
+            <button class='reset-angle'>reset</button>
+            <button class='flip'>flip</button>
+        </div>
+    `);
+    const keys = ['scaleX','scaleY','left','top','skewX','skewY','angle'];
+    const inputs = {};
+    const inits = {};
+    const resets = { 'reset-skew': ['skewX','skewY'], 'reset-scale': ['scaleX', 'scaleY'], 'reset-shift': ['left','top'], 'reset-angle': ['angle'] };
 
-                <strong>scale</strong>
-                x: <input class='scaleX' type='range' value='1' min='0.01' max='1' step='0.01'/>
-                y: <input class='scaleY' type='range' value='1' min='0.01' max='1' step='0.01'/>
-                <button class='reset-scale'>reset</button>
-                <label>lock<input type='checkbox' checked class='lock'></label>
-                <br>
+    for (let key of keys) {
+        inits[key] = fabImage[key];
+        inputs[key] = controls.find(`.${key}`)[0];
+        inputs[key].value = inits[key];
+    }
 
-                <strong>skew&nbsp;</strong>
-                x: <input class='skewX' type='range' value='0' min='-80' max='80' step='1'/>
-                y: <input class='skewY' type='range' value='0' min='-80' max='80' step='1'/>
-                <button class='reset-skew'>reset</button>
-                <br>
-
-                <strong>angle</strong>
-                <input class='angle' type='range' value='0' min='0' max='360'/>
-                <button class='reset-angle'>reset</button>
-                <button class='flip'>flip</button>
-                <br>
-
-            `);
-            const keys = ['scaleX','scaleY','left','top','skewX','skewY','angle'];
-            const inputs = {};
-            const inits = {};
-            const resets = { 'reset-skew': ['skewX','skewY'], 'reset-scale': ['scaleX', 'scaleY'], 'reset-shift': ['left','top'], 'reset-angle': ['angle'] };
-
-            for (let key of keys) {
-                inits[key] = fabImage[key];
-                inputs[key] = controls.find(`.${key}`)[0];
+    for (let reset of Object.keys(resets)) {
+        controls.find(`.${reset}`).click(() => {
+            for (let key of resets[reset]) {
+                fabImage.set(key, inits[key]);
                 inputs[key].value = inits[key];
-            }
-
-            for (let reset of Object.keys(resets)) {
-                controls.find(`.${reset}`).click(() => {
-                    for (let key of resets[reset]) {
-                        fabImage.set(key, inits[key]);
-                        inputs[key].value = inits[key];
-                        canvas.requestRenderAll();
-                    }
-                });
-            }
-
-            const flipControl = controls.find('.flip')[0];
-            const lockControl = controls.find('.lock')[0];
-
-            for (let key of ['left','top','skewX','skewY','angle']) {
-                inputs[key].oninput = () => {
-                  fabImage.set(key, parseInt(inputs[key].value, 10)).setCoords();
-                  canvas.requestRenderAll();
-                }
-            }
-
-            $(flipControl).click(() => {
-                fabImage.set('flipX', !fabImage.flipX);
                 canvas.requestRenderAll();
-            });
-
-            inputs['scaleX'].oninput = function() {
-              if ($(lockControl).is(':checked')) {
-                  fabImage.scale(parseFloat(inputs['scaleX'].value)).setCoords();
-                  inputs['scaleY'].value = inputs['scaleX'].value;
-              } else {
-                  fabImage.set('scaleX', parseFloat(inputs['scaleX'].value)).setCoords();
-              }
-              canvas.requestRenderAll();
-            };
-
-            inputs['scaleY'].oninput = function() {
-              if ($(lockControl).is(':checked')) {
-                  fabImage.scale(parseFloat(inputs['scaleY'].value)).setCoords();
-                  inputs['scaleX'].value = inputs['scaleY'].value;
-              } else {
-                  fabImage.set('scaleY', parseFloat(inputs['scaleY'].value)).setCoords();
-              }
-              canvas.requestRenderAll();
-            };
-
-            function updateControls() {
-                for (let key of keys) {
-                    inputs[key].value = that.fabImage[key];
-                }
             }
+        });
+    }
 
-            canvas.on({
-              'object:moving': updateControls,
-              'object:scaling': updateControls,
-              'object:resizing': updateControls,
-              'object:rotating': updateControls,
-              'object:skewing': updateControls
-            });
+    const flipControl = controls.find('.flip')[0];
+    const lockControl = controls.find('.lock')[0];
+
+    for (let key of ['left','top','skewX','skewY','angle']) {
+        inputs[key].oninput = () => {
+          fabImage.set(key, parseInt(inputs[key].value, 10)).setCoords();
+          canvas.requestRenderAll();
         }
     }
+
+    $(flipControl).click(() => {
+        fabImage.set('flipX', !fabImage.flipX);
+        canvas.requestRenderAll();
+    });
+
+    inputs['scaleX'].oninput = function() {
+      if ($(lockControl).is(':checked')) {
+          fabImage.scale(parseFloat(inputs['scaleX'].value)).setCoords();
+          inputs['scaleY'].value = inputs['scaleX'].value;
+      } else {
+          fabImage.set('scaleX', parseFloat(inputs['scaleX'].value)).setCoords();
+      }
+      canvas.requestRenderAll();
+    };
+
+    inputs['scaleY'].oninput = function() {
+      if ($(lockControl).is(':checked')) {
+          fabImage.scale(parseFloat(inputs['scaleY'].value)).setCoords();
+          inputs['scaleX'].value = inputs['scaleY'].value;
+      } else {
+          fabImage.set('scaleY', parseFloat(inputs['scaleY'].value)).setCoords();
+      }
+      canvas.requestRenderAll();
+    };
+
+    function updateControls() {
+        for (let key of keys) {
+            inputs[key].value = fabImage[key];
+        }
+    }
+
+    canvas.on({
+      'object:moving': updateControls,
+      'object:scaling': updateControls,
+      'object:resizing': updateControls,
+      'object:rotating': updateControls,
+      'object:skewing': updateControls
+    });
+}
+
+
+$(document).ready(() => {
+    const initWidth = parseFloat($('#c').attr('width'));
+    const initHeight = parseFloat($('#c').attr('height'));
+    const fullWidth = window.innerWidth;
+    if (initWidth > fullWidth) {
+        $('#c').attr('width', fullWidth * 0.95);
+        $('#c').attr('height', fullWidth * 0.95 * (initHeight / initWidth));
+    }
+
+    const canvas = window.canvas = new fabric.Canvas('c');
 
     let atlas;
     let slides;
@@ -151,7 +156,8 @@ $(document).ready(() => {
         } else if (atlasIndex < 0) {
             atlasIndex = atlas.length - 1;
         }
-        return atlas[Math.floor(atlasIndex)];
+        const index = Math.floor(atlasIndex);
+        return atlas[index];
     }
 
     function slideFile() {
@@ -163,19 +169,26 @@ $(document).ready(() => {
         return slides[slideIndex];
     }
 
+    function atlasFilename() {
+        return atlasPath().split('/').slice(-1)[0].split('.').slice(0,-1).join('.');
+    }
+
+    function slideFilename() {
+        return slideFile().name.split('/').slice(-1)[0].split('.').slice(0,-1).join('.');
+    }
+
     function combinedFilename() {
-        const atlasFilename = atlasPath().split('/').slice(-1)[0].split('.').slice(0,-1).join('.');
         if (slides) {
-            const slideFilename = slideFile().name.split('/').slice(-1)[0].split('.').slice(0,-1).join('.');
-            return `${slideFilename}_${atlasFilename}.png`;
+            return `${slideFilename()}_${atlasFilename()}.png`;
         } else {
-            return `overlay_${atlasFilename}.png`;
+            return `overlay_${atlasFilename()}.png`;
         }
     }
 
     function updateSlide() {
         if (slides) {
             fileReader.readAsDataURL(slideFile());
+            $("#slide-title").html(`Current: slide #${slideIndex+1} of ${slides.length} <small>(${slideFilename()})</small>`);
         }
     }
 
@@ -195,14 +208,11 @@ $(document).ready(() => {
         canvas.setZoom(1.0);
     });
 
-
     fabric.Image.fromURL('/example-slide.jpg', (img) => {
         slideImage = img;
-        canvas.add(resize(img,800));
+        canvas.add(resize(img,Math.min(800,0.85*canvas.width)));
         canvas.centerObject(img);
-        window.slideImage = img;
-
-        new Image(img, $('#slide-controls'), "Slide Image Options");
+        setupImageControls(img,  $('#slide-controls'), "Slide Image Options", canvas);
     }, {
         originX: 'center',
         originY: 'center',
@@ -210,14 +220,13 @@ $(document).ready(() => {
 
     $.getJSON('atlases.json').then(json => {
         atlas = json.mouse.coronal;
+        $("#atlas-title").html(`Current: ${atlasFilename()}`);
 
         fabric.Image.fromURL(atlasPath(), (img) => {
             atlasImage = img;
-            canvas.add(resize(img,800));
+            canvas.add(resize(img,Math.min(800,0.85*canvas.width)));
             canvas.centerObject(img);
-            window.atlasImage = img;
-
-            new Image(img, $('#atlas-controls'), "Atlas Image Options");
+            setupImageControls(img, $('#atlas-controls'), "Atlas Image Options", canvas);
         }, {
             originX: 'center',
             originY: 'center',
@@ -228,9 +237,11 @@ $(document).ready(() => {
             const delta = e.originalEvent.wheelDelta / 120;
 
             if (target == atlasImage) {
+                e.preventDefault();
                 atlasIndex += delta;
                 atlasImage.setSrc(atlasPath(), () => {
                     canvas.requestRenderAll();
+                    $("#atlas-title").html(`Current: ${atlasFilename()}`);
                 });
             };
 
@@ -239,6 +250,8 @@ $(document).ready(() => {
     
     $('#slides').change((ev) => {
         slides = ev.currentTarget.files;
+        $('#prev-slide').prop("disabled", false);
+        $('#next-slide').prop("disabled", false);
         updateSlide();
     });
 

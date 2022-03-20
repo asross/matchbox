@@ -39,15 +39,17 @@ input[type=range] {
     width: 80px;
 }
 
+.container {
+    display: flex;
+}
 section {
-    float: left;
     padding: 1rem;
 }
 #controls {
-    width: 375px;
+    flex: 1 1 auto;
 }
 #canvas {
-    width: 1000px;
+    flex: 3 1 auto;
 }
 
 .control {
@@ -58,7 +60,59 @@ section {
     font-size: 11px;
 }
 
+.control-line {
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 1000px) {
+  .container {
+    display: block;
+  }
+  .controls {
+      display: flex;
+      flex-wrap: wrap;
+  }
+  .control {
+      flex: 1 1 auto;
+  }
+  #slides {
+      max-width: 120px;
+  }
+  #canvas {
+      position: relative;
+  }
+  footer {
+      position: absolute;
+      bottom: -1.5rem;
+      right: 1rem;
+  }
+  section {
+      padding-bottom: 0;
+  }
+  section + section {
+      padding-top: 0;
+  }
+  #download {
+     position: fixed;
+     top: 1rem;
+     right: 1rem;
+  }
+}
+
 button {
     font-size: 11px;
 }
 
+#download {
+    font-size: initial;
+}
+
+button:not(:disabled):hover {
+    cursor: pointer;
+}
+
+footer {
+    text-align: right;
+    font-size: 10px;
+    margin-top: 1rem;
+}

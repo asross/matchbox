@@ -12,43 +12,50 @@
     </head>
 
     <body>
-        <section id='controls'>
-            <h1>🐁 Mouse 🧠 Brain 🖼️ Matchbox</h1>
+        <div class='container'>
+            <section id='controls'>
+                <h1>🐁 Mouse 🧠 Brain 🖼️ Matchbox</h1>
 
-            <div class='control'>
-                <h3>Atlas</h3>
-                <label><strong>Select animal and angle:</strong>
-                    <select id='atlases' disabled>
-                        <option value='mouse.coronal'>Mouse (coronal)</option>
-                    </select>
-                </label>
-                <br>
-                Mousewheel (🐁🎡) over image to progress →
-            </div>
+                <div class='controls'>
+                    <div class='control'>
+                        <h3>Atlas</h3>
+                        <label><strong>Select animal and angle:</strong>
+                            <select id='atlases' disabled>
+                                <option value='mouse.coronal'>Mouse (coronal)</option>
+                            </select>
+                        </label>
+                        <div id='atlas-title'></div>
+                        Mousewheel (🐁🎡) over image to progress →
+                    </div>
 
-            <div class='control'>
-                <h3>Slides</h3>
-                <label><strong>Select files:</strong>
-                    <input id='slides' type='file' multiple />
-                </label>
-                <br>
-                
-                <button id='prev-slide'>← prev</button>
-                <button id='next-slide'>next →</button>
-            </div>
+                    <div class='control'>
+                        <h3>Slides</h3>
+                        <label><strong>Select files:</strong>
+                            <input id='slides' type='file' multiple />
+                        </label>
+                        <div id='slide-title'></div>
+                        <button disabled id='prev-slide'>← prev</button>
+                        <button disabled id='next-slide'>next →</button>
+                    </div>
 
-            <div id='slide-controls' class='control'>
-            </div>
+                    <div id='slide-controls' class='control'>
+                    </div>
 
-            <div id='atlas-controls' class='control'>
-            </div>
+                    <div id='atlas-controls' class='control'>
+                    </div>
+                </div>
 
-            <button id='download'>download image</button>
-        </section>
+                <button id='download'>download image</button>
+            </section>
 
-        <section id='canvas'>
-            <canvas id='c' width='1000' height='666'></canvas>
-        </section>
+            <section id='canvas'>
+                <canvas id='c' width='1000' height='666'></canvas>
+
+                <footer>
+                    Atlas from <a href='https://www.elsevier.com/books/paxinos-and-franklins-the-mouse-brain-in-stereotaxic-coordinates/paxinos/978-0-12-816157-9' target='_blank'>Paxinos, George, and Franklin</a> by way of <a href='http://labs.gaidi.ca/mouse-brain-atlas/'>Matt Gaidica</a>. Tool by <a href='https://asross.github.io/' target='_blank'>Andrew Ross</a> and <a href='https://neurosjk.home.blog/' target='_blank'>Su Jin Kim</a>.
+                </footer>
+            </section>
+        </div>
 
         <script src="gui.js"></script>
     </body>

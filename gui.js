@@ -17,14 +17,14 @@ function setupImageControls(fabImage, controls, title, canvas) {
         <h3>${title}</h3>
 
         <div class='control-line'>
-            <strong>shift</strong>
+            shift
             x: <input class='left' type='range' value='500' min='-200' max='1200' step='1'/>
             y: <input class='top' type='range' value='333' min='-200' max='866' step='1'/>
             <button class='reset-shift'>reset</button>
         </div>
 
         <div class='control-line'>
-            <strong>scale</strong>
+            scale
             x: <input class='scaleX' type='range' value='1' min='0.01' max='1' step='0.01'/>
             y: <input class='scaleY' type='range' value='1' min='0.01' max='1' step='0.01'/>
             <button class='reset-scale'>reset</button>
@@ -32,14 +32,14 @@ function setupImageControls(fabImage, controls, title, canvas) {
         </div>
 
         <div class='control-line'>
-            <strong>skew&nbsp;</strong>
+            skew&nbsp;
             x: <input class='skewX' type='range' value='0' min='-80' max='80' step='1'/>
             y: <input class='skewY' type='range' value='0' min='-80' max='80' step='1'/>
             <button class='reset-skew'>reset</button>
         </div>
 
         <div class='control-line'>
-            <strong>angle</strong>
+            angle
             <input class='angle' type='range' value='0' min='-360' max='360'/>
             <button class='reset-angle'>reset</button>
             <button class='flip'>flip</button>
@@ -116,7 +116,6 @@ function setupImageControls(fabImage, controls, title, canvas) {
     });
 }
 
-
 $(document).ready(() => {
     const initWidth = parseFloat($('#c').attr('width'));
     const initHeight = parseFloat($('#c').attr('height'));
@@ -170,8 +169,16 @@ $(document).ready(() => {
         return slides[slideIndex];
     }
 
-    function atlasFilename() {
-        return atlasPath().split('/').slice(-1)[0].split('.').slice(0,-1).join('.');
+    function atlasFilename(path) {
+        if (!path) {
+            path = atlasPath();
+        }
+        return path.split('/').slice(-1)[0].split('.').slice(0,-1).join('.');
+    }
+
+    function atlasPosition(path) {
+        const f = atlasFilename(path);
+        return f.split('_').slice(-2).join(' = ');
     }
 
     function slideFilename() {
@@ -189,7 +196,36 @@ $(document).ready(() => {
     function updateSlide() {
         if (slides) {
             fileReader.readAsDataURL(slideFile());
-            $("#slide-title").html(`Current: slide #${slideIndex+1} of ${slides.length} <small>(${slideFilename()})</small>`);
+            $("#slide-title").html(`
+                Current:
+                <strong>slide #${slideIndex+1} of ${slides.length}</strong>
+                <small>(${slideFilename()})</small>
+            `);
+        }
+    }
+
+    const atlasQueue = [];
+
+    function updateAtlas() {
+        atlasQueue.push(atlasPath());
+        checkAtlas();
+    }
+
+    function checkAtlas() {
+        console.log(atlasQueue);
+        if (!atlasQueue.length) {
+            return;
+        } else {
+            const path = atlasQueue.shift();
+            atlasImage.setSrc(path, () => {
+                canvas.requestRenderAll();
+                $("#atlas-title").html(`
+                    Current: 
+                    <strong>${atlasPosition(path)}</strong>
+                    <small>(<a href='${path}' target='_blank'>${atlasFilename(path)}</a>)</small>
+                `);
+                checkAtlas();
+            });
         }
     }
 
@@ -229,6 +265,7 @@ $(document).ready(() => {
             canvas.add(resize(img,Math.min(800,0.85*canvas.width)));
             canvas.centerObject(img);
             setupImageControls(img, $('#atlas-controls'), "Atlas Image Options", canvas);
+            updateAtlas();
         }, {
             originX: 'center',
             originY: 'center',
@@ -236,17 +273,12 @@ $(document).ready(() => {
 
         $(canvas.wrapperEl).on('wheel', e => {
             const target = canvas.findTarget(e);
-            const delta = e.originalEvent.wheelDelta / 120;
-
+            const delta = e.originalEvent.wheelDelta / 200;
             if (target == atlasImage) {
                 e.preventDefault();
                 atlasIndex += delta;
-                atlasImage.setSrc(atlasPath(), () => {
-                    canvas.requestRenderAll();
-                    $("#atlas-title").html(`Current: ${atlasFilename()}`);
-                });
+                updateAtlas();
             };
-
         });
     });
     
@@ -255,6 +287,13 @@ $(document).ready(() => {
         $('#prev-slide').prop("disabled", false);
         $('#next-slide').prop("disabled", false);
         updateSlide();
+    });
+
+    $('#atlases').change((ev) => {
+        const parts = $(ev.currentTarget).val().split('.');
+        atlas = atlasJson[parts[0]][parts[1]];
+        atlasIndex = 0;
+        updateAtlas();
     });
 
     $('#prev-slide').click(() => {
@@ -267,13 +306,13 @@ $(document).ready(() => {
         updateSlide();
     });
 
-    $('#atlases').change((ev) => {
-        const parts = $(ev.currentTarget).val().split('.');
-        atlas = atlasJson[parts[0]][parts[1]];
-        atlasIndex = 0;
-        atlasImage.setSrc(atlasPath(), () => {
-            canvas.requestRenderAll();
-            $("#atlas-title").html(`Current: ${atlasFilename()}`);
-        });
+    $('#prev-atlas').click(() => {
+        atlasIndex -= 1;
+        updateAtlas();
+    });
+
+    $('#next-atlas').click(() => {
+        atlasIndex += 1;
+        updateAtlas();
     });
 });

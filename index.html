@@ -19,7 +19,7 @@
                 <div class='controls'>
                     <div class='control'>
                         <h3>Atlas</h3>
-                        <label><strong>Select animal and angle:</strong>
+                        <label>Select atlas:
                             <select id='atlases'>
                                 <option value='mouse.coronal' selected>Mouse (coronal)</option>
                                 <option value='mouse.sagittal'>Mouse (sagittal)</option>
@@ -28,12 +28,14 @@
                             </select>
                         </label>
                         <div id='atlas-title'></div>
-                        Mousewheel (🐁🎡) over image to progress →
+                        <button id='prev-atlas'>← prev</button>
+                        <button id='next-atlas'>next →</button>
+                        or mousewheel (🐁🎡) over image →
                     </div>
 
                     <div class='control'>
                         <h3>Slides</h3>
-                        <label><strong>Select files:</strong>
+                        <label>Select files:
                             <input id='slides' type='file' multiple />
                         </label>
                         <div id='slide-title'></div>

@@ -1,7 +1,3 @@
-
-// [ ] Set background color with color picker
-// [ ] Save image bounding rect
-
 function download(imageURL, filename) {
     const element = document.createElement('a');
     element.setAttribute('href', imageURL);
@@ -315,4 +311,21 @@ $(document).ready(() => {
         atlasIndex += 1;
         updateAtlas();
     });
+
+    function updateBackground() {
+        const bgtype = $("input[name='bgtype']:checked").val();
+
+        if (bgtype == 'clear') {
+            canvas.setBackgroundColor('', () => {
+                canvas.requestRenderAll();
+            });
+        } else {
+            canvas.setBackgroundColor($('#bgcolor').val(), () => {
+                canvas.requestRenderAll();
+            });
+        }
+    }
+
+    $("input[name='bgtype']").click(updateBackground);
+    $('#bgcolor').change(updateBackground);
 });

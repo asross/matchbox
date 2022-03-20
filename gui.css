@@ -55,10 +55,17 @@ button:not(:disabled):hover {
     white-space: nowrap;
 }
 
+.background-select, footer {
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+input[type=color] {
+    vertical-align: top;
+}
+
 footer {
-    text-align: right;
-    font-size: 10px;
-    margin-top: 1rem;
+    float: right;
 }
 
 @media screen and (max-width: 1000px) {
@@ -77,11 +84,6 @@ footer {
   }
   #canvas {
       position: relative;
-  }
-  footer {
-      position: absolute;
-      bottom: -1.5rem;
-      right: 1rem;
   }
   section {
       padding-bottom: 0;

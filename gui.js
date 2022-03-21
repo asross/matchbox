@@ -35,8 +35,8 @@ function setupImageControls(fabImage, controls, title, canvas) {
         </div>
 
         <div class='control-line'>
-            angle
-            <input class='angle' type='range' value='0' min='-360' max='360'/>
+            angle:&nbsp;&nbsp;
+            <input class='angle' type='range' value='0' min='-180' max='180' step='1'/>
             <button class='reset-angle'>reset</button>
             <button class='flip'>flip</button>
         </div>
@@ -44,7 +44,12 @@ function setupImageControls(fabImage, controls, title, canvas) {
     const keys = ['scaleX','scaleY','left','top','skewX','skewY','angle'];
     const inputs = {};
     const inits = {};
-    const resets = { 'reset-skew': ['skewX','skewY'], 'reset-scale': ['scaleX', 'scaleY'], 'reset-shift': ['left','top'], 'reset-angle': ['angle'] };
+    const resets = {
+        'reset-skew': ['skewX','skewY'],
+        'reset-scale': ['scaleX', 'scaleY'],
+        'reset-shift': ['left','top'],
+        'reset-angle': ['angle']
+    };
 
     for (let key of keys) {
         inits[key] = fabImage[key];
@@ -208,7 +213,6 @@ $(document).ready(() => {
     }
 
     function checkAtlas() {
-        console.log(atlasQueue);
         if (!atlasQueue.length) {
             return;
         } else {
@@ -225,20 +229,25 @@ $(document).ready(() => {
         }
     }
 
-    $('#download').click(() => {
-        const w = canvas.width;
-        const h = canvas.height;
+    function cropping() {
+        const b1 = atlasImage.getBoundingRect();
+        const b2 = slideImage.getBoundingRect();
+        const l = Math.max(0, Math.min(b1.left, b2.left));
+        const t = Math.max(0, Math.min(b1.top, b2.top));
+        const r = Math.min(canvas.width, Math.max(b1.left + b1.width, b2.left + b2.width));
+        const b = Math.min(canvas.height, Math.max(b1.top + b1.height, b2.top + b2.height));
+        return { left: l, top: t, width: r-l, height: b-t };
+    }
 
+    $('#download').click(() => {
         const w1 = atlasImage.width * atlasImage.scaleX;
         const w2 = slideImage.width * slideImage.scaleX;
-
-        let biggest = (w1 > w2) ? atlasImage : slideImage;
-
-        canvas.setDimensions({ width: w / biggest.scaleX, height: h / biggest.scaleY });
-        canvas.setZoom(1.0 / biggest.scaleX);
-        download(canvas.toDataURL('image/png'), combinedFilename());
-        canvas.setDimensions({ width: w, height: h });
-        canvas.setZoom(1.0);
+        const biggest = (w1 > w2) ? atlasImage : slideImage;
+        const scale = 1.0 / biggest.scaleX;
+        download(
+            canvas.toCanvasElement(scale, cropping()).toDataURL('image/png'),
+            combinedFilename()
+        )
     });
 
     fabric.Image.fromURL('/example-slide.jpg', (img) => {

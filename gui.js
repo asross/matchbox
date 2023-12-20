@@ -127,6 +127,7 @@ $(document).ready(() => {
     }
 
     const canvas = window.canvas = new fabric.Canvas('c');
+    const rootPath = location.href.replace(/\/$/, '');
 
     let atlasJson;
     let atlas;
@@ -158,7 +159,7 @@ $(document).ready(() => {
             atlasIndex = atlas.length - 1;
         }
         const index = Math.floor(atlasIndex);
-        return atlas[index];
+        return `${rootPath}/${atlas[index]}`;
     }
 
     function slideFile() {
@@ -250,7 +251,7 @@ $(document).ready(() => {
         )
     });
 
-    fabric.Image.fromURL('/example-slide.jpg', (img) => {
+    fabric.Image.fromURL(`${rootPath}/example-slide.jpg`, (img) => {
         slideImage = img;
         canvas.add(resize(img,Math.min(800,0.85*canvas.width)));
         canvas.centerObject(img);
@@ -260,7 +261,7 @@ $(document).ready(() => {
         originY: 'center',
     });
 
-    $.getJSON('atlases.json').then(json => {
+    $.getJSON(`${rootPath}/atlases.json`).then(json => {
         atlasJson = json;
         atlas = json.mouse.coronal;
         $("#atlas-title").html(`Current: ${atlasFilename()}`);
